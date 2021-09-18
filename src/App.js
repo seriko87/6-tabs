@@ -5,8 +5,8 @@ const url = "https://course-api.com/react-tabs-project";
 function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState(null);
-  const [selectedUser, setSelectedUser] = useState([]);
-  const [btnSelected, setBtnSelected] = useState(false);
+
+  const [value, setValue] = useState(0);
 
   useEffect(() => {
     fetch(url)
@@ -14,18 +14,12 @@ function App() {
       .then((emp) => {
         setUser(emp);
         setIsLoading(false);
-        setSelectedUser(emp[0]);
-        setBtnSelected(emp[0].id);
       })
       .catch((error) => console.log(error));
   }, []);
 
-  const handleClick = (id) => {
-    setSelectedUser(() => {
-      const newUser = user.filter((e) => e.id === id);
-      return newUser[0];
-    });
-    setBtnSelected(id);
+  const handleClick = (index) => {
+    setValue(index);
   };
 
   if (isLoading) {
@@ -36,18 +30,18 @@ function App() {
     );
   }
 
+  const { title, company, dates, duties } = user[value];
   return (
     <main>
       <h1>Experience</h1>
       <div className='container'>
         <section className='company'>
-          {user.map((items) => {
+          {user.map((items, index) => {
             return (
               <button
-                onClick={() => handleClick(items.id)}
-                className={`btn ${
-                  btnSelected === items.id ? "active-btn" : false
-                }`}
+                key={index}
+                onClick={() => handleClick(index)}
+                className={`btn ${value === index ? "active-btn" : false}`}
               >
                 {items.company}
               </button>
@@ -56,20 +50,16 @@ function App() {
         </section>
         <section className='user'>
           <div>
-            <h2>{selectedUser.title}</h2>
-            <p className='p-company'>{selectedUser.company}</p>
-            <p className='p-dates'>{selectedUser.dates}</p>
-            {selectedUser.duties ? (
-              selectedUser.duties.map((item) => {
-                return (
-                  <p className='info'>
-                    <FaAngleDoubleRight /> {item}
-                  </p>
-                );
-              })
-            ) : (
-              <div></div>
-            )}
+            <h2>{title}</h2>
+            <p className='p-company'>{company}</p>
+            <p className='p-dates'>{dates}</p>
+            {duties.map((item) => {
+              return (
+                <p className='info'>
+                  <FaAngleDoubleRight /> {item}
+                </p>
+              );
+            })}
           </div>
 
           <button className='moreInfo'>More Info</button>
